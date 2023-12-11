@@ -157,7 +157,7 @@ class Gui(tk.Tk):
         self.finance_tracker = finance_tracker
 
         # Create and add widgets (e.g., buttons, labels) to the window
-        self.select_file_button = tk.Button(self, text="Import File", command=self.open_file_dialog)
+        self.select_file_button = tk.Button(self, text="Import File", command=self.open_file_dialog(self.finance_tracker))
         self.select_file_button.pack(pady=20)  # Add padding around the button
 
         self.button1 = tk.Button(self, text="Create Graph", command=self.clicked_graph_button)
