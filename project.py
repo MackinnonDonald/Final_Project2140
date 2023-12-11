@@ -123,20 +123,35 @@ class PersonalFinanceTracker:
             transaction.display()
 
     def plot_transaction_amounts(self):
-        """Creates bar graph displaying money in each transaction category"""
-        amounts = [transaction.amount for transaction in self.transactions]
-        categories = [transaction.category for transaction in self.transactions]
+        """Creates bar graph displaying total money in each transaction category"""
+        category_totals = {}
+
+        # Iterate through transactions and accumulate amounts for each category
+        for transaction in self.transactions:
+            category = transaction.category
+            amount = transaction.amount
+
+            # If category already exists in the dictionary, add the amount
+            if category in category_totals:
+                category_totals[category] += amount
+            else:
+                # Otherwise, create a new entry for the category
+                category_totals[category] = amount
+
+        # Extract categories and total amounts for plotting
+        categories = list(category_totals.keys())
+        total_amounts = list(category_totals.values())
 
         # Plot bar chart
-        plt.bar(categories, amounts, color=['green' if amount > 0 else 'red' for amount in amounts])
+        plt.bar(categories, total_amounts, color=['green' if amount > 0 else 'red' for amount in total_amounts])
 
         # Add annotations (values) to the bars
-        for i, amount in enumerate(amounts):
+        for i, amount in enumerate(total_amounts):
             plt.text(i, amount, f"${amount}", ha='center', va='bottom')
 
         plt.xlabel('Categories')
-        plt.ylabel('Amount ($)')
-        plt.title('Transaction Amounts')
+        plt.ylabel('Total Amount ($)')
+        plt.title('Total Transaction Amounts by Category')
         plt.show()
 
 class Gui(tk.Tk):
@@ -158,7 +173,7 @@ class Gui(tk.Tk):
 
         # Create and add widgets (e.g., buttons, labels) to the window
         self.select_file_button = tk.Button(self, text="Import File", command=self.open_file_dialog(self.finance_tracker))
-        self.select_file_button.pack(pady=20)  # Add padding around the button
+        self.select_file_button.pack(pady=20)  
 
         self.button1 = tk.Button(self, text="Create Graph", command=self.clicked_graph_button)
         self.button1.pack(pady=20, padx=20)
