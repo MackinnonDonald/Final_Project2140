@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 import matplotlib.pyplot as plt
+import pandas as pd
 
 class Transaction:
     """
@@ -31,11 +32,11 @@ class IncomeTransaction(Transaction):
     A subclass of Transaction representing an income transaction
     
     :param amount: The amount of income of the transaction
-    :param cateory: The category the income belongs to
+    :param category: The category the income belongs to
     :param description: A short description of the transaction
     :param source: The source of the income
     """
-    def __init__(self, amount, category, description, source):
+    def __init__(self, amount, type, category, description, source):
         """
         Initialize a new instance of IncomeTransaction
         
@@ -44,6 +45,7 @@ class IncomeTransaction(Transaction):
         :param description: A short description of the transaction
         :param source: The source of the income"""
         super().__init__(amount, category, description)
+        self.type = type
         self.source = source
 
     def display(self):
@@ -60,7 +62,7 @@ class ExpenseTransaction(Transaction):
     :param description: A short description of the expense
     :param payment_method: The method to pay the expense
     """
-    def __init__(self, amount, category, description, payment_method):
+    def __init__(self, amount, type, category, description, payment_method):
         """Initialize a new instance of ExpenseTransaction
         
         :param amount: The amount of the expense
@@ -69,6 +71,7 @@ class ExpenseTransaction(Transaction):
         :param payment_method: The method to pay the expense
         """
         super().__init__(amount, category, description)
+        self.type = type
         self.payment_method = payment_method
 
     def display(self):
@@ -76,7 +79,7 @@ class ExpenseTransaction(Transaction):
         super().display()
         print(f"Payment Method: {self.payment_method}")
 
-class PersonalFinanceTracker :
+class PersonalFinanceTracker:
     """
     A class representin a personal finance tracker
     
@@ -160,27 +163,45 @@ class Gui(tk.Tk):
         self.button1 = tk.Button(self, text="Create Graph", command=self.clicked_graph_button)
         self.button1.pack(pady=20, padx=20)
 
-    def open_file_dialog(self):
+    def open_file_dialog(self, finance_tracker):
         """Open the file explorer dialog"""
         file_path = filedialog.askopenfilename(title="Select a File")
 
         if file_path:
             print(f"Selected File: {file_path}")
 
+        try:
+            data = pd.read_excel(file_path, header=None)
+            pass
+        except FileNotFoundError:
+            raise TypeError(f"The source file '{file_path}' does not exist.")
+        
+        all_data = data.values.tolist()
+
+        for row in all_data:
+            if row[1] == 'Income':
+                new_income_transaction = IncomeTransaction(row[0], row[1], row[2], row[3], row[4])
+                finance_tracker.add_transaction(new_income_transaction)
+            elif row[1] == 'Expense':
+                new_expense_transaction = ExpenseTransaction(row[0], row[1], row[2], row[3], row[4])
+                finance_tracker.add_transaction(new_expense_transaction)
+            else:
+                print(f"Unhandeled transaction type: {row[1]}")
+                continue
+
     def clicked_graph_button(self):
         self.finance_tracker.plot_transaction_amounts()
-
 
 # Example usage:
 if __name__ == "__main__":
     finance_tracker = PersonalFinanceTracker()
 
     # Adding transactions
-    income_transaction = IncomeTransaction(1000, "Income", "Salary", "XYZ Company")
-    expense_transaction = ExpenseTransaction(-50, "Food", "Groceries", "Credit Card")
+    income_transaction = IncomeTransaction(1000, "Income","Salary", "Yeah ight", "XYZ Company")
+    expense_transaction = ExpenseTransaction(-50, "Expense","Food", "Groceries", "Credit Card")
 
-    example_transaction1 = IncomeTransaction(69, "Donation", "Literally just asked", "Best friend")
-    example_transaction2 = ExpenseTransaction(-132, "Entertainment", "Costco-Membership", "Credit Card")
+    example_transaction1 = IncomeTransaction(69, "Income","Donation", "Literally just asked", "Best friend")
+    example_transaction2 = ExpenseTransaction(-132, "Expense","Entertainment", "Costco-Membership", "Credit Card")
 
     finance_tracker.add_transaction(income_transaction)
     finance_tracker.add_transaction(expense_transaction)
