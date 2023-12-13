@@ -122,7 +122,7 @@ class PersonalFinanceTracker:
         for transaction in self.transactions:
             transaction.display()
 
-    def plot_transaction_amounts(self):
+    def total_categories(self):
         """Creates bar graph displaying total money in each transaction category"""
         category_totals = {}
 
@@ -137,6 +137,11 @@ class PersonalFinanceTracker:
             else:
                 # Otherwise, create a new entry for the category
                 category_totals[category] = amount
+
+        return category_totals
+            
+    def plot_transaction_amounts(self):
+        category_totals = self.total_categories()
 
         # Extract categories and total amounts for plotting
         categories = list(category_totals.keys())
