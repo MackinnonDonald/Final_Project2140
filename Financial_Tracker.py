@@ -5,7 +5,7 @@ import pandas as pd
 
 class Transaction:
     """
-    A class representing a transaction
+    A class representing a transaction with no assigned type (income or expense)
     
     :param amount: The amount of money of the transaction
     :param category: The category the transaction belongs to
@@ -19,6 +19,8 @@ class Transaction:
         :param category: The category the transaction belongs to
         :param description: A short description of the transaction 
         """
+        if not isinstance(amount, (int, float)):
+            raise TypeError("Amount must be an integer or float.")
         self.amount = amount
         self.category = category
         self.description = description
@@ -26,6 +28,7 @@ class Transaction:
     def display(self):
         """Returns the attributes of a transaction"""
         print(f"Amount: ${self.amount}, Category: {self.category}, Description: {self.description}")
+        return f"Amount: ${self.amount}, Category: {self.category}, Description: {self.description}"
 
 class IncomeTransaction(Transaction):
     """
@@ -45,13 +48,17 @@ class IncomeTransaction(Transaction):
         :param description: A short description of the transaction
         :param source: The source of the income"""
         super().__init__(amount, category, description)
+        if not isinstance(amount, (int, float)):
+            raise TypeError("Amount must be an integer or float.")
+        elif amount < 0:
+            raise ValueError("Amount of an income transaction must be greater than 0.")
         self.type = type
         self.source = source
 
     def display(self):
         """Returns the attributes of an income transaction"""
-        super().display()
-        print(f"Source: {self.source}")
+        print(f"Amount: ${self.amount}, Type: {self.type}, Category: {self.category}, Description: {self.description}, Source: {self.source}")
+        return f"Amount: ${self.amount}, Type: {self.type}, Category: {self.category}, Description: {self.description}, Source: {self.source}"
 
 class ExpenseTransaction(Transaction):
     """
@@ -71,13 +78,17 @@ class ExpenseTransaction(Transaction):
         :param payment_method: The method to pay the expense
         """
         super().__init__(amount, category, description)
+        if not isinstance(amount, (int, float)):
+            raise TypeError("Amount must be an integer or float.")
+        elif amount > 0:
+            raise ValueError("Amount of an expense transaction must be less than 0.")
         self.type = type
         self.payment_method = payment_method
 
     def display(self):
         """Returns the attributees of an expense transaction"""
-        super().display()
-        print(f"Payment Method: {self.payment_method}")
+        print(f"Amount: ${self.amount}, Type: {self.type}, Category: {self.category}, Description: {self.description}, Payment Method: {self.payment_method}")
+        return f"Amount: ${self.amount}, Type: {self.type}, Category: {self.category}, Description: {self.description}, Payment Method: {self.payment_method}"
 
 class PersonalFinanceTracker:
     """
@@ -217,17 +228,19 @@ if __name__ == "__main__":
     finance_tracker = PersonalFinanceTracker()
 
     # Adding transactions
-    income_transaction = IncomeTransaction(1000, "Income","Salary", "Yeah ight", "XYZ Company")
-    expense_transaction = ExpenseTransaction(-50, "Expense","Food", "Groceries", "Credit Card")
+    # income_transaction = IncomeTransaction(-1000, "Income","Salary", "Yeah ight", "XYZ Company")
+    # expense_transaction = ExpenseTransaction(-50, "Expense","Food", "Groceries", "Credit Card")
 
-    example_transaction1 = IncomeTransaction(69, "Income","Donation", "Literally just asked", "Best friend")
-    example_transaction2 = ExpenseTransaction(-132, "Expense","Entertainment", "Costco-Membership", "Credit Card")
+    # example_transaction1 = IncomeTransaction(69, "Income","Donation", "Literally just asked", "Best friend")
+    # example_transaction2 = ExpenseTransaction(-132, "Expense","Entertainment", "Costco-Membership", "Credit Card")
 
-    finance_tracker.add_transaction(income_transaction)
-    finance_tracker.add_transaction(expense_transaction)
-    finance_tracker.add_transaction(example_transaction1)
-    finance_tracker.add_transaction(example_transaction2)
+    # finance_tracker.add_transaction(income_transaction)
+    # finance_tracker.add_transaction(expense_transaction)
+    # finance_tracker.add_transaction(example_transaction1)
+    # finance_tracker.add_transaction(example_transaction2)
 
+    sample_transaction = Transaction(1000, "Bank Robbery", "Robbed a bank")
+    sample_transaction.display()
     # Displaying balance and transactions
     finance_tracker.show_balance()
     finance_tracker.show_transactions()
