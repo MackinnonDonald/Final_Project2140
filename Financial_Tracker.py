@@ -188,11 +188,16 @@ class Gui(tk.Tk):
         self.finance_tracker = finance_tracker
 
         # Create and add widgets (e.g., buttons, labels) to the window
-        self.select_file_button = tk.Button(self, text="Import File", command=self.open_file_dialog(self.finance_tracker))
-        self.select_file_button.pack(pady=20)  
+        self.import_file_button = tk.Button(self, text="Import File", command= lambda: self.open_file_dialog(self.finance_tracker))
+        self.import_file_button.pack(pady=20)  
 
-        self.button1 = tk.Button(self, text="Create Graph", command=self.clicked_graph_button)
-        self.button1.pack(pady=20, padx=20)
+        self.graph_button = tk.Button(self, text="Create Graph", command=self.clicked_graph_button)
+        self.graph_button.pack(pady=20, padx=20)
+
+        self.update_bal_button = tk.Button(self, text="Update Balance", command=self.update_balance_label)
+        self.update_bal_button.pack(pady=30,padx=20)
+        self.balance_label = tk.Label(self, text=f"Current Balance: ${self.finance_tracker.balance}")
+        self.balance_label.pack(pady=40)
 
     def open_file_dialog(self, finance_tracker):
         """Open the file explorer dialog"""
@@ -219,9 +224,14 @@ class Gui(tk.Tk):
             else:
                 print(f"Unhandeled transaction type: {row[1]}")
                 continue
+        print(f"Data from '{file_path}' has been successfully imported")
+        self.update_balance_label()
 
     def clicked_graph_button(self):
         self.finance_tracker.plot_transaction_amounts()
+    
+    def update_balance_label(self):
+        self.balance_label.config(text=f"Current Balance: ${self.finance_tracker.balance}")
 
 # Example usage:
 if __name__ == "__main__":
@@ -230,9 +240,6 @@ if __name__ == "__main__":
     # Adding transactions
     # income_transaction = IncomeTransaction(-1000, "Income","Salary", "Yeah ight", "XYZ Company")
     # expense_transaction = ExpenseTransaction(-50, "Expense","Food", "Groceries", "Credit Card")
-
-    # example_transaction1 = IncomeTransaction(69, "Income","Donation", "Literally just asked", "Best friend")
-    # example_transaction2 = ExpenseTransaction(-132, "Expense","Entertainment", "Costco-Membership", "Credit Card")
 
     # finance_tracker.add_transaction(income_transaction)
     # finance_tracker.add_transaction(expense_transaction)
