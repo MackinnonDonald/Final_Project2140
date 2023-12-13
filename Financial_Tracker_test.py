@@ -28,7 +28,13 @@ class TestFinanceTracker(unittest.TestCase):
         self.assertIsInstance(sample_income_transaction, IncomeTransaction)
         self.assertEqual(sample_income_transaction.display(), expected_result3)
 
-    # def test_invalid_income_transaction(self):
+    def test_invalid_income_transaction(self):
+        """Tests invalid types of income transactions and the errors raised"""
+        with self.assertRaises(ValueError):
+            invalid_income_transaction = IncomeTransaction(-413.23, "Income", "Salary", "Income Taxes", "IRS")
+        with self.assertRaises(TypeError):
+            invalid_income_transaction2 = IncomeTransaction('1738.01', "Income", "Donation", "Tax Refund", "IRS")
+
 
     def test_create_expense_transaction(self):
         """Testing the ExpenseTransaction class and its functions"""
@@ -36,6 +42,13 @@ class TestFinanceTracker(unittest.TestCase):
         expected_result4 = "Amount: $-100.24, Type: Expense, Category: Grocerries, Description: WholeFoods, Payment Method: Credit Card"
         self.assertIsInstance(sample_expense_transaction, ExpenseTransaction)
         self.assertEqual(sample_expense_transaction.display(), expected_result4)
+
+    def test_invalid_expense_transaction(self):
+        """Tests invalid types of income transactions and the errors raised"""
+        with self.assertRaises(ValueError):
+            invalid_income_transaction = ExpenseTransaction(413.23, "Expense", "Refund", 123, "Debit Card")
+        with self.assertRaises(TypeError):
+            invalid_income_transaction2 = IncomeTransaction('-178.21', "Expense", "Five Guys", "Keeping it real", "Credit Card")
 
 if __name__ == '__main__':
     unittest.main()
