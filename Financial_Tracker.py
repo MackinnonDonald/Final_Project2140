@@ -291,13 +291,9 @@ class NewTransactionWindow(tk.Toplevel):
             # Create a Series with the correct order of columns
             new_transaction_series = pd.Series(new_transaction_data, index=existing_header)
 
-            # Read the existing data
+            # Read the existing data, add new transaction to it, write to excel
             new_data = pd.read_excel(self.excel_file_path)
-
-            # Append the new transaction to the existing data
             new_data = new_data._append(new_transaction_series, ignore_index=True)
-
-            # Write the updated data back to the Excel file
             new_data.to_excel(self.excel_file_path, index=False, header=True, engine='openpyxl')
 
         # Add the new transaction to the finance tracker
@@ -310,7 +306,7 @@ class NewTransactionWindow(tk.Toplevel):
         else:
             print(f"Unhandled transaction type: {transaction_type}")
 
-        # Close the dialog
+        # Close the window
         self.destroy()
 
 # Example usage:
