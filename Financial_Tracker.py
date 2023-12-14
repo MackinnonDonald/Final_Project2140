@@ -362,21 +362,6 @@ class RemoveTransactionWindow(tk.Toplevel):
 if __name__ == "__main__":
     finance_tracker = PersonalFinanceTracker()
 
-    # Adding transactions
-    # income_transaction = IncomeTransaction(-1000, "Income","Salary", "Yeah ight", "XYZ Company")
-    # expense_transaction = ExpenseTransaction(-50, "Expense","Food", "Groceries", "Credit Card")
-
-    # finance_tracker.add_transaction(income_transaction)
-    # finance_tracker.add_transaction(expense_transaction)
-    # finance_tracker.add_transaction(example_transaction1)
-    # finance_tracker.add_transaction(example_transaction2)
-
-    sample_transaction = Transaction(1000, "Bank Robbery", "Robbed a bank")
-    # sample_transaction.display()
-    # Displaying balance and transactions
-    finance_tracker.show_balance()
-    finance_tracker.show_transactions()
-
     my_gui = Gui(finance_tracker)
 
     my_gui.mainloop()

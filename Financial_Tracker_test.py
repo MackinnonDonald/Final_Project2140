@@ -35,7 +35,6 @@ class TestFinanceTracker(unittest.TestCase):
         with self.assertRaises(TypeError):
             invalid_income_transaction2 = IncomeTransaction('1738.01', "Income", "Donation", "Tax Refund", "IRS")
 
-
     def test_create_expense_transaction(self):
         """Testing the ExpenseTransaction class and its functions"""
         sample_expense_transaction = ExpenseTransaction(-100.24, "Expense", "Grocerries", "WholeFoods", "Credit Card")
