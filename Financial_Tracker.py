@@ -118,6 +118,15 @@ class PersonalFinanceTracker:
         self.transactions.append(transaction)
         self.balance += transaction.amount
 
+    def remove_transaction(self, transaction_index):
+        """Removes transaction object from transaction list"""
+        try:
+            self.balance -= self.transactions[transaction_index-1].amount
+            removed_transaction = self.transactions.pop(transaction_index - 1)  # Adjust for 0-based index
+            return removed_transaction
+        except IndexError:
+            raise IndexError("Invalid transaction index.")
+
     def show_balance(self):
         """Display current balance"""
         print(f"Current Balance: ${self.balance}")
@@ -192,9 +201,11 @@ class Gui(tk.Tk):
 
         self.add_transaction_button = tk.Button(self, text = "Add new transaction", command= lambda: self.open_new_transaction_window())
         self.add_transaction_button.pack(pady=25)
+        self.remove_transaction_button = tk.Button(self, text = "Remove transaction", command = lambda: self.open_remove_transaction_window())
+        self.remove_transaction_button.pack(pady=30)
 
         self.display_transactions_button = tk.Button(self, text = "Display transactions", command = lambda: self.display_transactions()) 
-        self.display_transactions_button.pack(pady=30)
+        self.display_transactions_button.pack(pady=35)
 
         self.update_bal_button = tk.Button(self, text="Update Balance", command=self.update_balance_label)
         self.update_bal_button.pack(pady=40,padx=20)
@@ -250,6 +261,9 @@ class Gui(tk.Tk):
 
     def open_new_transaction_window(self):
         NewTransactionWindow(self, self.finance_tracker, self.excel_file_path)
+
+    def open_remove_transaction_window(self):
+        RemoveTransactionWindow(self, self.finance_tracker)
 
 class NewTransactionWindow(tk.Toplevel):
     def __init__(self, parent, finance_tracker, excel_file_path=None):
@@ -320,6 +334,30 @@ class NewTransactionWindow(tk.Toplevel):
         # Close the window
         self.destroy()
 
+class RemoveTransactionWindow(tk.Toplevel):
+    def __init__(self, parent, finance_tracker, excel_file_path=None):
+        super().__init__(parent)
+        self.title("Remove Transaction")
+
+        # Create entry widgets
+        self.transaction_index_entry = tk.Entry(self, width=10)
+        tk.Label(self, text="Transaction Index:").grid(row=0, column=0, padx=10, pady=5)
+        self.transaction_index_entry.grid(row=0, column=1)
+
+        tk.Button(self, text="Remove Transaction", command=self.remove_transaction).grid(row=5, column=0, columnspan=2, pady=10)
+
+        self.finance_tracker = finance_tracker
+
+    def remove_transaction(self):
+        try:
+            transaction_index = int(self.transaction_index_entry.get())
+            self.finance_tracker.remove_transaction(transaction_index)
+            print(f"Removed transaction at index {transaction_index}")
+        except ValueError:
+            print("Invalid input. Please enter a valid integer.")
+        except IndexError:
+            print("Invalid transaction index.")
+        
 # Example usage:
 if __name__ == "__main__":
     finance_tracker = PersonalFinanceTracker()
