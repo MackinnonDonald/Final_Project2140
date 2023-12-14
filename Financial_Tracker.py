@@ -24,10 +24,8 @@ class Transaction:
         self.amount = amount
         self.category = category
         self.description = description
-
-    def display(self):
-        """Returns the attributes of a transaction"""
-        print(f"Amount: ${self.amount}, Category: {self.category}, Description: {self.description}")
+    
+    def __str__(self):
         return f"Amount: ${self.amount}, Category: {self.category}, Description: {self.description}"
 
 class IncomeTransaction(Transaction):
@@ -55,9 +53,7 @@ class IncomeTransaction(Transaction):
         self.type = type
         self.source = source
 
-    def display(self):
-        """Returns the attributes of an income transaction"""
-        print(f"Amount: ${self.amount}, Type: {self.type}, Category: {self.category}, Description: {self.description}, Source: {self.source}")
+    def __str__(self):
         return f"Amount: ${self.amount}, Type: {self.type}, Category: {self.category}, Description: {self.description}, Source: {self.source}"
 
 class ExpenseTransaction(Transaction):
@@ -85,9 +81,8 @@ class ExpenseTransaction(Transaction):
         self.type = type
         self.payment_method = payment_method
 
-    def display(self):
+    def __str__(self):
         """Returns the attributees of an expense transaction"""
-        print(f"Amount: ${self.amount}, Type: {self.type}, Category: {self.category}, Description: {self.description}, Payment Method: {self.payment_method}")
         return f"Amount: ${self.amount}, Type: {self.type}, Category: {self.category}, Description: {self.description}, Payment Method: {self.payment_method}"
 
 class PersonalFinanceTracker:
@@ -190,18 +185,21 @@ class Gui(tk.Tk):
 
         # Create and add widgets (e.g., buttons, labels) to the window
         self.import_file_button = tk.Button(self, text="Import File", command= lambda: self.open_file_dialog(self.finance_tracker))
-        self.import_file_button.pack(pady=20)  
+        self.import_file_button.pack(pady=10)  
 
         self.graph_button = tk.Button(self, text="Create Graph", command=self.clicked_graph_button)
-        self.graph_button.pack(pady=20, padx=20)
-
-        self.update_bal_button = tk.Button(self, text="Update Balance", command=self.update_balance_label)
-        self.update_bal_button.pack(pady=30,padx=20)
-        self.balance_label = tk.Label(self, text=f"Current Balance: ${self.finance_tracker.balance}")
-        self.balance_label.pack(pady=30)
+        self.graph_button.pack(pady=20)
 
         self.add_transaction_button = tk.Button(self, text = "Add new transaction", command= lambda: self.open_new_transaction_window())
-        self.add_transaction_button.pack(pady=40)
+        self.add_transaction_button.pack(pady=25)
+
+        self.display_transactions_button = tk.Button(self, text = "Display transactions", command = lambda: self.display_transactions()) 
+        self.display_transactions_button.pack(pady=30)
+
+        self.update_bal_button = tk.Button(self, text="Update Balance", command=self.update_balance_label)
+        self.update_bal_button.pack(pady=40,padx=20)
+        self.balance_label = tk.Label(self, text=f"Current Balance: ${self.finance_tracker.balance}")
+        self.balance_label.pack(pady=40)
 
     def open_file_dialog(self, finance_tracker):
         """Open the file explorer dialog"""
@@ -230,6 +228,19 @@ class Gui(tk.Tk):
                 continue
         print(f"Data from '{self.excel_file_path}' has been successfully imported")
         self.update_balance_label()
+
+    def display_transactions(self):
+        display_window = tk.Toplevel(self)
+        display_window.title("All Transactions")
+
+        text_widget = tk.Text(display_window, height=100, width=250)
+        text_widget.pack(padx=50,pady=50)
+
+        all_transactions = self.finance_tracker.transactions
+
+        for i, transaction in enumerate(all_transactions, start=1):
+            transaction_str = f"{i}) {str(transaction)}\n"
+            text_widget.insert(tk.END, transaction_str)
 
     def clicked_graph_button(self):
         self.finance_tracker.plot_transaction_amounts()
@@ -323,7 +334,7 @@ if __name__ == "__main__":
     # finance_tracker.add_transaction(example_transaction2)
 
     sample_transaction = Transaction(1000, "Bank Robbery", "Robbed a bank")
-    sample_transaction.display()
+    # sample_transaction.display()
     # Displaying balance and transactions
     finance_tracker.show_balance()
     finance_tracker.show_transactions()
