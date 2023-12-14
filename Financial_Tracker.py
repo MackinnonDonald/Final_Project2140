@@ -197,7 +197,10 @@ class Gui(tk.Tk):
         self.update_bal_button = tk.Button(self, text="Update Balance", command=self.update_balance_label)
         self.update_bal_button.pack(pady=30,padx=20)
         self.balance_label = tk.Label(self, text=f"Current Balance: ${self.finance_tracker.balance}")
-        self.balance_label.pack(pady=40)
+        self.balance_label.pack(pady=30)
+
+        self.add_transaction_button = tk.Button(self, text = "Add new transaction", command= lambda: self.open_new_transaction_window())
+        self.add_transaction_button.pack(pady=40)
 
     def open_file_dialog(self, finance_tracker):
         """Open the file explorer dialog"""
@@ -232,6 +235,62 @@ class Gui(tk.Tk):
     
     def update_balance_label(self):
         self.balance_label.config(text=f"Current Balance: ${self.finance_tracker.balance}")
+
+    def open_new_transaction_window(self):
+        NewTransactionWindow(self, self.finance_tracker)
+
+class NewTransactionWindow(tk.Toplevel):
+    def __init__(self, parent, finance_tracker):
+        super().__init__(parent)
+        self.title("New Transaction")
+
+        # Create entry widgets
+        self.amount_entry = tk.Entry(self, width=10)
+        self.transaction_type_entry = tk.Entry(self, width=20)
+        self.category_entry = tk.Entry(self, width=20)
+        self.description_entry = tk.Entry(self, width=30)
+        self.source_or_payment_entry = tk.Entry(self, width=30)
+
+        # Create labels for entry widgets
+        tk.Label(self, text="Amount:").grid(row=0, column=0, padx=10, pady=5)
+        tk.Label(self, text="Type (Income/Expense):").grid(row=1, column=0, padx=10, pady=5)
+        tk.Label(self, text="Category:").grid(row=2, column=0, padx=10, pady=5)
+        tk.Label(self, text="Description:").grid(row=3, column=0, padx=10, pady=5)
+        tk.Label(self, text="Source/Payment Method:").grid(row=4, column=0, padx=10, pady=5)
+
+        # Position entry widgets
+        self.amount_entry.grid(row=0, column=1)
+        self.transaction_type_entry.grid(row=1, column=1)
+        self.category_entry.grid(row=2, column=1)
+        self.description_entry.grid(row=3, column=1)
+        self.source_or_payment_entry.grid(row=4, column=1)
+
+        # Create button to add the new transaction
+        tk.Button(self, text="Add Transaction", command=self.add_new_transaction).grid(row=5, column=0, columnspan=2, pady=10)
+
+        # Store reference to finance tracker
+        self.finance_tracker = finance_tracker
+
+    def add_new_transaction(self):
+        # Retrieve user input from entry widgets
+        amount = float(self.amount_entry.get())
+        transaction_type = self.transaction_type_entry.get()
+        category = self.category_entry.get()
+        description = self.description_entry.get()
+        source_or_payment_method = self.source_or_payment_entry.get()
+
+        # Add the new transaction to the finance tracker
+        if transaction_type == 'Income':
+            new_income_transaction = IncomeTransaction(amount, transaction_type, category, description, source_or_payment_method)
+            self.finance_tracker.add_transaction(new_income_transaction)
+        elif transaction_type == 'Expense':
+            new_expense_transaction = ExpenseTransaction(amount, transaction_type, category, description, source_or_payment_method)
+            self.finance_tracker.add_transaction(new_expense_transaction)
+        else:
+            print(f"Unhandled transaction type: {transaction_type}")
+
+        # Close the dialog
+        self.destroy()
 
 # Example usage:
 if __name__ == "__main__":
