@@ -177,7 +177,7 @@ class Gui(tk.Tk):
     :param balance: The balance of the account after all transactions
     :param transactions: A list containing all the transactions
     """
-    def __init__(self, finance_tracker):
+    def __init__(self, finance_tracker, excel_file_path=None):
         # Initialize the window
         super().__init__()
 
@@ -186,6 +186,7 @@ class Gui(tk.Tk):
         
         # Store the finance tracker instance
         self.finance_tracker = finance_tracker
+        self.excel_file_path = excel_file_path
 
         # Create and add widgets (e.g., buttons, labels) to the window
         self.import_file_button = tk.Button(self, text="Import File", command= lambda: self.open_file_dialog(self.finance_tracker))
@@ -204,16 +205,16 @@ class Gui(tk.Tk):
 
     def open_file_dialog(self, finance_tracker):
         """Open the file explorer dialog"""
-        file_path = filedialog.askopenfilename(title="Select a File")
+        self.excel_file_path = filedialog.askopenfilename(title="Select a File")
 
-        if file_path:
-            print(f"Selected File: {file_path}")
+        if self.excel_file_path:
+            print(f"Selected File: {self.excel_file_path}")
 
         try:
-            data = pd.read_excel(file_path, header=None)
+            data = pd.read_excel(self.excel_file_path, header=None)
             pass
         except FileNotFoundError:
-            raise TypeError(f"The source file '{file_path}' does not exist.")
+            raise TypeError(f"The source file '{self.excel_file_path}' does not exist.")
         
         all_data = data.values.tolist()
 
@@ -227,7 +228,7 @@ class Gui(tk.Tk):
             else:
                 print(f"Unhandeled transaction type: {row[1]}")
                 continue
-        print(f"Data from '{file_path}' has been successfully imported")
+        print(f"Data from '{self.excel_file_path}' has been successfully imported")
         self.update_balance_label()
 
     def clicked_graph_button(self):
@@ -237,10 +238,10 @@ class Gui(tk.Tk):
         self.balance_label.config(text=f"Current Balance: ${self.finance_tracker.balance}")
 
     def open_new_transaction_window(self):
-        NewTransactionWindow(self, self.finance_tracker)
+        NewTransactionWindow(self, self.finance_tracker, self.excel_file_path)
 
 class NewTransactionWindow(tk.Toplevel):
-    def __init__(self, parent, finance_tracker):
+    def __init__(self, parent, finance_tracker, excel_file_path=None):
         super().__init__(parent)
         self.title("New Transaction")
 
@@ -270,6 +271,7 @@ class NewTransactionWindow(tk.Toplevel):
 
         # Store reference to finance tracker
         self.finance_tracker = finance_tracker
+        self.excel_file_path = excel_file_path
 
     def add_new_transaction(self):
         # Retrieve user input from entry widgets
@@ -278,6 +280,25 @@ class NewTransactionWindow(tk.Toplevel):
         category = self.category_entry.get()
         description = self.description_entry.get()
         source_or_payment_method = self.source_or_payment_entry.get()
+        # If an Excel file path is provided, append the new transaction to the existing data
+        if self.excel_file_path:
+            # Ensure the order of columns in new_transaction_data matches the Excel file
+            new_transaction_data = [amount, transaction_type, category, description, source_or_payment_method]
+
+            # Get the header from the existing Excel file (assuming the first row is the header)
+            existing_header = pd.read_excel(self.excel_file_path, nrows=0).columns
+
+            # Create a Series with the correct order of columns
+            new_transaction_series = pd.Series(new_transaction_data, index=existing_header)
+
+            # Read the existing data
+            new_data = pd.read_excel(self.excel_file_path)
+
+            # Append the new transaction to the existing data
+            new_data = new_data._append(new_transaction_series, ignore_index=True)
+
+            # Write the updated data back to the Excel file
+            new_data.to_excel(self.excel_file_path, index=False, header=True, engine='openpyxl')
 
         # Add the new transaction to the finance tracker
         if transaction_type == 'Income':
